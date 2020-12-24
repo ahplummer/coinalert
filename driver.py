@@ -4,10 +4,21 @@ import locale
 
 from pycoingecko import CoinGeckoAPI
 
+
+twilioapi = os.environ['TWILIOAPI']
+twiliosecret = os.environ['TWILIOSECRET']
+coins = os.environ['COINS']
+tonumbers = os.environ["TONUMBERS"]
+fromnumber = os.environ["TWILIONUMBER"]
+
+if twiliosecret == None or twilioapi == None or coins == None or tonumbers == None or fromnumber == None:
+    print("You need TWILIOAPI, TWILIOSECRET, COINS, TONUMBERS, TWILIONUMBER set as envvars.")
+    exit(1)
+
 locale.setlocale( locale.LC_ALL, 'en_US.UTF-8' )
 cg = CoinGeckoAPI()
 
-resp = cg.get_price(ids=os.environ['COINS'], vs_currencies='usd')
+resp = cg.get_price(ids=coins, vs_currencies='usd')
 
 message = ""
 for k in resp.keys():
@@ -18,13 +29,13 @@ for k in resp.keys():
 
 print(message)
 if len(message) > 10:
-    account_sid = os.environ['TWILIOAPI']
-    auth_token  = os.environ['TWILIOSECRET']
+    account_sid = twilioapi
+    auth_token  = twiliosecret
 
     client = Client(account_sid, auth_token)
 
     message = client.messages.create(
-        to=os.environ["TONUMBERS"],
-        from_=os.environ["TWILIONUMBER"],
+        to=tonumbers,
+        from_=fromnumber,
         body=message)
     print(message.sid)
